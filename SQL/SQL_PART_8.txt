@@ -1,0 +1,90 @@
+Error Handling:
+    In SQL Server 2000 - @@Error
+    In SQL Server 2005 & Later - Try...Catch
+
+    To throw custom error:
+        RAISERROR('Error Message',ErrorSeverity,ErrorState)
+        Severity level = 16 (indicates general errors that can be corrected by the user)
+        State = Number between 1 & 255. RAISERROR only generates errors with state from 1 through 127
+
+    @@Error return  a NON-ZERO value, if there us an error, otherwise ZERO, indicating that 
+        the previous SQL statement encountered no errors.
+    @@Error is cleared and reset on each statement execution.
+    Check it immediately following thr statement being verified, or save it to a local variable that can be checked later.
+
+    With Introduction of Try/Catch blocks in SQL Server 2005, error handling in sql server is 
+        now similar to programming language like c#, java, etc.
+    
+    Code:
+        BEGIN TRY
+            <statement>
+        END TRY
+        BEGIN CATCH
+            <exception handling>
+            SELECT 
+                ERROR_NUMBER()
+                ERROR_MESSAGE()
+                ERROR_PROCEDURE()
+                ERROR_STATE()
+                ERROR_SEVERITY()
+                ERROR_LINE()
+        END CATCH
+    
+    Any set of SQL statements, that can possibly throw an exception are wrapped between BEGIN TRY and END TRY blocks. 
+    If there is an exception in the TRY block, the control immediately, jumps to the CATCH block. 
+    If there is no exception, CATCH block will be skipped, and the statements, after the CATCH block are executed.
+    
+    Errors trapped by a CATCH block are not returned to the calling application. 
+    If any part of the error information must be returned to the application, 
+        the code in the CATCH block must do so by using RAISERROR() function.
+    
+    In the scope of the CATCH block, there are several system functions, that are used to retrieve more information 
+        about the error that occurred.
+    These functions return NULL if they are executed outside the scope of the CATCH block.
+
+    TRY/CATCH cannot be used in a user-defined functions.
+
+Transactions:
+    It is a group of commands that change the data stored in a database.
+    A transaction, is treated as a single unit.
+    A transaction ensures that, either all of the commands succeed, or none of them.
+    If one of the commands in the transaction fails, all the commands fail, 
+        and any data that was modified in the database is rolled back.
+    
+    Code:
+        BEGIN TRANSACTION
+            <sql_query>
+        {ROLLBACK|COMMIT} TRANSACTION
+
+    To see un-committed changes:
+        SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+    Transaction processing follows these steps:
+        Begin a transaction
+        Process database commands
+        Check for errors
+            If errors occured,
+                rollback the transaction,
+            else,
+                commit the transaction
+
+    ACID Test:
+        A successful transaction must pass the ACID test.
+        
+        Atomic:
+            All statements in the transaction is either completed successfully or they were rolled back.
+            The task that the set of operations represents is either accomplishment or not, but in any case not left half-done.
+
+        Consistent:
+            All data touched by the transaction is left in a logically consistent state.
+        
+        Isolated:
+            The transaction must affect data without interfering with other concurrent transactions, or being interfered with by them.
+            This prevents transactions from making changes to data based on uncommitted informatyion.
+            Most databases use locking to maintain transaction isolation.
+
+        Durable:
+            Once a change is made, it is permanent.
+            If a system error or power failure occurs before a set of commands is complerte, those commands are undone 
+                and the data is restored to its original state once the system begins running again.
+

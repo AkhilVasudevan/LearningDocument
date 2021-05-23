@@ -1,0 +1,112 @@
+Indexes:
+    Indexes are used by queries to find the data from tables quickly.
+    Indexes are created on tables and views.
+    Index on a table or view is similar to an index we find in a book.
+    Table and View indexes can help the query to find data quickly.
+    
+    The existance of teh right indexes can drastically improve the performance of the query.
+    If there is no index to help the query, then the query engine, checks every row in the table from beginning to the end. 
+        This is called as Table Scan.
+    Table scan is bad for performance.
+
+    Create Index:
+        CREATE INDEX <index_name> ON <table_name> (<column_name> {asc|desc})
+
+    sp_Helpindex <table_name> - used to get the details about the index available for the table.
+
+    Drop Index:
+        drop index <table_name>.<index_name>
+
+    Types of Indexes:
+        Clustered
+        Non-Clustered
+        Unique
+        Filtered
+        XML
+        Full Text
+        Spatial
+        Columnstore
+        Index with included columns
+        Index on computed columns
+
+    Clustered Index:
+        It determines the physical order of data in a table.
+        For the above reason, it should have only one clustered index.
+
+        A primary key will always create a clustered index by default.
+
+        A clustered index is analogous to a telephone directory, where the data is arranged by the last name.
+        The index can contain multiple columns, like the telephone directory is organized by last name and first name.
+
+        Composite clustered index:
+            CREATE CLUSTERED INDEX <index_name> ON <table_name>(<column_name_1> {ASC|DESC},<column_name_2> {ASC|DESC},....)
+
+        when creating clustered index by own, it is necessary to drop the existing clustered index.
+        Using command primary key clustered index cannot be deleted, so use UI to delete that index.
+
+    Non-Clustered Index:
+        It is analogous to an index in a textbook.
+        The data is stored in one place, the index in another place.
+        The index will have pointers to the storage location of the data.
+
+        The non-clustered index is stored seperately from the actual data.
+        A table can have more than one non-lustered index.
+
+        In the index itself, the data is stored in an ascending order or descending order of the index key.
+
+        Code:
+            CREATE NONCLUSTERED INDEX <index_name> ON <table_name>(<column_name> {ASC|DESC})
+
+    Clustered vs Non-Clustered:
+        1. Only one clustered index per table, where as you can have more than one non clustered index
+        2. Clustered index is faster than a non clustered index, because, the non-clustered index has to refer back to the table, 
+            if the selected column is not present in the index.
+        3. Clustered index determines the storage order of rows in the table, and hence doesn't require additional disk space, 
+            but where as a Non Clustered index is stored seperately from the table, additional storage space is required.
+
+    Unique Index:
+        It is used to enforce uniqueness of key values in the index.
+        By default, PRIMARY KEY constraint, creates a unique clustered index.
+        Explicitly dropping of unique index in primary key is not possible. By using UI, it is possible to drop.
+
+        Code:
+            CREATE UNIQUE NONCLUSTERED INDEX <index_name> ON <table_name>(<columns>,....)
+        
+    Unique Constraint vs Unique Index:
+        No major difference.
+        When user add a unique constraint, a unique index gets created behind the scenes.
+
+        when should you be creating a Unique constraint over a unique index?
+            To make our intentions clear, create a unique constraint, when data integrity is the objective. 
+            This makes the objective of the index very clear. 
+            In either cases, data is validated in the same manner, and the query optimizer does not differentiate between
+                 a unique index created by a unique constraint or manually created.
+
+    Note:
+        1. By default, a PRIMARY KEY constraint, creates a unique clustered index, where as a UNIQUE constraint c
+            reates a unique nonclustered index. These defaults can be changed if you wish to.
+        2. A UNIQUE constraint or a UNIQUE index cannot be created on an existing table, 
+            if the table contains duplicate values in the key columns. Obviously, to solve this,
+            remove the key columns from the index definition or delete or update the duplicate values.
+
+    Advantages:
+        SELECT, DELETE, UPDATE statements benifits on execution on having indexes.
+        Indexes can also help queries, that ask for sorted result.
+        It also help the query having DESC, by scanning the index in reverse order.
+        Group by queries can also benifit from indexes.
+    
+    Disadvantages:
+        Additional disk space - for non-clustered index. 
+            Space depends on the size of table, and the numver and types of columns used in the index.
+        Insert Update and delete statements can become slow - DML statements modifies data in a table, 
+            which also modifies all the indexes of the table, which take time to complete the execution of DML statements.
+    
+    Covering Query:
+        If all the columns requested in the in the SELECT clause of query, are present in the index, 
+            then there is no need to lookup in the table again.
+        The requested data can simply be returned from the index.
+
+        A clustered index, always covers a query, since it contains all of the data in a table.
+        A composite index is an index on two or more columns.
+        Both clustered and non-clustered indexes can be composite indexes.
+        To a certain extent, a composite index, can cover a query.

@@ -1,0 +1,247 @@
+Triggers:
+    Triggers are stored programs, which are automatically executed or fired when some events occur.
+
+    Types:
+        DML Triggers
+        DDL Triggers
+        LogOn Triggers
+
+    DML Triggers:
+        DML triggers are fired automatically in response to DML events(INSERT,UPDATE & DELETE)
+
+        Types:
+            After Triggers(FOR Triggers) - fires after the trigger action
+            Instead of Triggers - fires instead of the triggered action
+
+        "Inserted" is a special table that is used by triggers, and also available only in the context of the insert trigger.
+        SQL server retains the copy of the row inserted by creating a table called inserted in memory.
+        It will be accessed within the context of the trigger.
+        It will have the structure of the table in which the trigger operates.
+
+        "Deleted" is a special table that is used by triggers, and also available only in the context of the delete trigger.
+        It will maintain the data of the deleted table.
+        Other properties are as same as "Inserted" table.
+
+        Update trigger context can access both "Inserted" and "Deleted" tables.
+        Here "Inserted" table contains updated data and "Deleted" table contains old data.
+
+        After Triggers:
+            It fires after the trigger action.
+            
+            Code:
+                {CREATE|ALTER} TRIGGER <trigger_name>
+                ON <table_name>
+                FOR {INSERT|DELETE|UPDATE}
+                AS
+                BEGIN
+                    <trigger_statements>
+                END
+
+        Instead of Triggers:
+            It fires instead of the triggered action.
+            It has been used to run insert, update & delete queries on views.
+
+            Code:
+                {CREATE|ALTER} TRIGGER <trigger_name>
+                ON <view_name>
+                INSTEAD OF {INSERT|UPDATE|DELETE}
+                AS
+                BEGIN
+                    <trigger_statement>
+                END
+
+            Update(<column_name>)
+                Returns a Boolean value that indicates whether an INSERT or UPDATE attempt was 
+                    made on a specified column of a table or view.
+
+
+Derived Tables and CTE:
+
+    Note:
+        Views get saved in the database, and can be available to other queries and stored procedures.
+        However, if this view is only used at this one place it can be easily eliminated using other options, 
+            like CTE, DerivedTables, Temp Tables, Tbale Variable etc.
+
+        Temporary tables are stored in TempDB.
+        Local temporary tables are visible only in the current session, and can be shared between nested stored procedure calls.
+        Global temporary tables are visible to other sessions and are destroyed, when the last connection referencing the table is closed.
+
+    Table variable:
+        Just like TempTables, a table variable is also created in TempDB.
+        The scope of a table variable is the batch, stored procedure or statement block in which it is declared.
+        They can be passed as parameters between procedures.
+
+        Code:
+            DECLARE @<table_variable> TABLE(<columns>.....)
+            INSERT @<table_variable> .......
+    
+    Derived Tables:
+        Derived tables are available only in the context of the current query.
+
+        Example Code:
+            Select DeptName,TotalEmployees from 
+            (
+                select EmployeeDetails.DepartmentID as DepartmentId,
+                        DepartmentName as DeptName,
+                        count(*) as TotalEmployees
+                from EmployeeDetails 
+                join DepartmentDetails 
+                on EmployeeDetails.DepartmentID=DepartmentDetails.DepartmentID
+                group by DepartmentName,EmployeeDetails.DepartmentID
+            )
+            as EmployeeCount
+            where TotalEmployees>=2
+
+    Common Table Expression(CTE):
+        CTE is introduced in SQL Server 2005. A CTE is a temporary result set, that can be referenced 
+            within a SELECT, INSERT, UPDATE, or DELETE statement, that immediately follows CTE.
+        
+        Syntax:
+            WITH <cte_name>(<column1>,<columns2>,....)
+            AS
+            (<cte_query>)
+
+        It is possible to have multiple CTEs by seperating with comma.
+
+        Syntax:
+            WITH 
+            <cte_1>(<columns.....>)
+            AS
+            (cte_1_query),
+            <cte_2>(<columns.....>)
+            AS
+            (cte_2_query)
+
+        A CTE can be thought of as a temporary result set that us defined within the execution 
+            scope of a single SELECT, INSERT, UPDATE, DELETE or CREATE VIEW statement.
+        A CTE is sismilar to a derived table in theat it is not as an object and lasts only for the duration of the query.
+
+        Example Code:
+            WITH EmployeeCount(DeptName,DepartmentId,TotalEmployees)
+            AS
+            (
+                select EmployeeDetails.DepartmentID as DepartmentId,
+                        DepartmentName as DeptName,
+                        count(*) as TotalEmployees
+                from EmployeeDetails 
+                join DepartmentDetails 
+                on EmployeeDetails.DepartmentID=DepartmentDetails.DepartmentID
+                group by DepartmentName,EmployeeDetails.DepartmentID
+            )
+            select DeptName,TotalEmployees
+            from EmployeeCount
+            where TotalEmployees>=2
+
+        It is possible to update a CTE with certain circumstances.
+        If a CTE is created on one base table, then it is possible to update the CTE, which in turn will update underlying base table.
+        Example:
+            With employee_name_gender
+            as
+            (select id,name,gender from tblemployee)
+            update employee_name_gender
+            set gender='Female' where ID=1
+        
+        If a CTE is based on more than one table, and if the UPDATE affects only one base table, then update is allowed.
+        Example:    
+            With employeebydepartment
+            as
+            (
+                select Id,Name,Gender,DeptName
+                from tblemployee
+                join tbldepartment
+                on tbldepartment.DeptId=tblEmployee.DepartmentId
+            )
+            update employeebydepartment set Gender='Male' where Id=1
+
+        If a CTE is based on more than one table, and if the UPDATE affects more than one base table, then update is not allowed.
+        Example:    
+            With employeebydepartment
+            as
+            (
+                select Id,Name,Gender,DeptName
+                from tblemployee
+                join tbldepartment
+                on tbldepartment.DeptId=tblEmployee.DepartmentId
+            )
+            update employeebydepartment set Gender='Male',DeptName='IT' where Id=1
+
+        If a CTE is based on more than one base table, if the UPDATE affects only one base table, 
+            the UPDATE succeeds but not as expected always.
+        Example:
+            With employeebydepartment
+            as
+            (
+                select Id,Name,Gender,DeptName
+                from tblemployee
+                join tbldepartment
+                on tbldepartment.DeptId=tblEmployee.DepartmentId
+            )
+            update employeebydepartment set DeptName='IT' where Id=1
+        
+    Recursive CTE:
+        Get recursively items from the table based on heirarchy.
+        example:
+            With Tree(NodeName,ParentName)
+            AS
+            (
+                select NodeName,ParentName from TreeStructure where NodeName=@Node
+            
+                UNION ALL
+            
+                select TreeStructure.NodeName,TreeStructure.ParentName from TreeStructure
+                Join Tree
+                on TreeStructure.ParentName=Tree.NodeName
+            )
+            select NodeName,ParentName from Tree;
+
+PIVOT operator:
+    It is a sql server operator that can be used to turn unique values from one column into multiple columns in the output,
+        there by effectively rotating a table.
+
+    Syntax:
+        SELECT <non-pivoted_column>,<pivoted_column>,....
+        FROM {<table_name} | <select_query>}
+        PIVOT
+        (
+            <aggregate_function>(<aggregating_column>)
+            FOR <pivotting_column>
+            IN ([<pivotted_column>],....)
+        )
+        AS <pivot_name>
+        [ORDER BY <column_name>]
+
+    example:
+        select total amount by country and agent together from a transaction table.
+
+        --using groupby
+            select salescountry,salesagent, sum(salesamount) as total
+            from tblproductsales
+            group by salescountry, salesagent
+            order by salescountry, salesagent
+
+        --using pivot operator
+            select salesagent,india,us,uk
+            from tblproductsales
+            PIVOT
+            (
+                SUM(salesamount)
+                FOR salescountry
+                IN ([india],[us],[uk])
+            )
+            AS pivottable
+
+        --using pivot operator with derived table
+            select salesagent,india,us,uk
+            from 
+            (
+                select salesagent,salescountry,salesamount
+                from tblproductsales
+            ) as SourceTable
+            PIVOT
+            (
+                SUM(salesamount)
+                FOR salescountry
+                IN ([india],[us],[uk])
+            )
+            AS pivottable
+

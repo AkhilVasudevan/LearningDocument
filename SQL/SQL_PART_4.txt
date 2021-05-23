@@ -1,0 +1,229 @@
+String Functions:
+    Two categories:
+        Built-in Functions - https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql?view=sql-server-ver15
+        User Defined Functions
+
+DateTime Functions:
+    https://docs.microsoft.com/en-us/sql/t-sql/functions/date-and-time-data-types-and-functions-transact-sql?view=sql-server-ver15
+
+    example: -- function to find age 
+    CREATE FUNCTION fnComputeAge(@DOB DATETIME)
+    RETURNS NVARCHAR(50)
+    AS
+    BEGIN
+        DECLARE @tempdate DATETIME, @years INT, @months INT, @days INT
+            
+            SELECT @tempdate = @DOB
+            SELECT @years = DATEDIFF(YEAR, @tempdate, GETDATE()) - CASE WHEN (MONTH(@DOB) > MONTH(GETDATE())) OR (MONTH(@DOB) = MONTH(GETDATE()) AND DAY(@DOB) > DAY(GETDATE())) THEN 1 ELSE 0 END
+            SELECT @tempdate = DATEADD(YEAR, @years, @tempdate)
+            SELECT @months = DATEDIFF(MONTH, @tempdate, GETDATE()) - CASE WHEN DAY(@DOB) > DAY(GETDATE()) THEN 1 ELSE 0 END
+            SELECT @tempdate = DATEADD(MONTH, @months, @tempdate)
+            SELECT @days = DATEDIFF(DAY, @tempdate, GETDATE())
+        DECLARE @Age NVARCHAR(50)
+            SET @Age = Cast(@years AS  NVARCHAR(4)) + ' Years ' + Cast(@months AS  NVARCHAR(2))+ ' Months ' +  Cast(@days AS  NVARCHAR(2))+ ' Days Old'
+        RETURN @Age
+    END
+
+    Date Part           Abbrevation
+    year                yy,yyyy
+    quarter             qq,q
+    month               mm,m
+    dayofyear           dy,y
+    day                 dd,d
+    week                wk,ww
+    weekday             dw
+    hour                hh
+    minute              mi,n
+    second              ss,s
+    millisecond         ms
+    microsecond         mcs
+    nanosecond          ns
+    TZoffsert           tz
+
+    (mostly used styles - many styles are available)
+    Style   DateFormat
+    101     mm/dd/yyyy
+    102     yy.mm.dd
+    103     dd/mm/yyyy
+    104     dd.mm.yy
+    105     dd-mm-yy
+
+CAST & CONVERT functions:
+    To convert one data type to another both functions are used.
+    Query:
+        CAST ( expression AS data_type [ ( length ) ] )
+        CONVERT ( data_type [ ( length ) ] , expression [ , style ] )
+
+    Difference:
+        CAST is based on ANSI standard and CONVERT is specific to SQL Server.
+            If portability is a concern and to used the script with other database applications, use CAST().
+        CONVERT provides more flexibility than CAST.
+            Its is possible to control how DateTime datatypes to be converted using styles with CONVERT function.
+
+Mathematical Functions:
+    https://docs.microsoft.com/en-us/sql/t-sql/functions/mathematical-functions-transact-sql?view=sql-server-ver15
+
+User Defined Functions:
+    Three types:
+        Scalar functions
+        Inline table-valued functions
+        Multi-statement table-valued functions
+
+    Scalar Function:
+        May or may not have parameters, but always have a single return value.
+        The return value can be of any type, except text,ntext,image,cursor and timestamp.
+        When calling scalar function two/three part name has to be used. eg: <databasename>.dbo.function_name()
+        
+        Code:
+            CREATE OR ALTER FUNCTION <function_name>(@<parameter1> <datatype>(<size>),....)
+            RETURNS @<return_variable> <datatype>
+            AS
+            BEGIN
+                <function_statements>
+                return @<return_variable>
+            END
+        
+        example:
+            CREATE FUNCTION CalculateAge(@DOB Date)
+            RETURNS INT
+            AS
+            BEGIN
+                DECLARE @Age INT
+                SET @Age =DATEDIFF(YEAR, @DOB, GETDATE()) - 
+                    CASE
+                        WHEN (MONTH(@DOB)>MONTH(GETDATE())) OR
+                             (MONTH(@DOB)=MONTH(GETDATE()) AND DAY(@DOB)>DAY(GETDATE()))
+                        THEN 1
+                        ELSE 0
+                    END
+                RETURN @Age
+            END
+
+        To Drop:
+            Drop FUNCTION <function_name>
+
+    Inline Table-Valued Function:
+        It returns a table.
+        Specify TABLE as the return type, instead of scalar type.
+        Function body is not enclosed with BEGIN and END block.
+        The structure of the table that gets returned, is determined by the SELECT statement within the function.
+        It can be also sed to achieve functionality of parameterized views.
+        The table returned by table-valued functions cqan also be used in joins with other tables.
+
+        Code:
+            CREATE OR ALTER FUNCTION <function_name>(@<parameter1> <datatype>(<size>),....)
+            RETURNS TABLE
+            AS
+            RETURN <select statement>
+
+        example:
+            CREATE FUNCTION fn_employeesbygender (@Gender nvarchar(50))
+            RETURNS TABLE
+            AS
+            RETURN (select id, name, DOB, Gender, departmentid from employee where gender=@Gender)
+
+        Execution:
+            select * from <function_name>(<parameters>)
+
+        example:
+            select * from fn_employeesbygender('Male');
+
+    Multi-Statement Table-Valued Functions:
+        It is same as that of previous method with few differences.
+        It has BEGIN and END block.
+
+        Code:
+            CREATE OR ALTER FUNCTION <function_name>(<parameters>)
+            RETURNS @<table_variable> TABLE (<columns> <data_type>(<size>))
+            AS
+            BEGIN
+                <statements>
+                RETURN
+            END
+
+        example:
+            Create Function fn_MSTVF_GetEmployees()
+            Returns @Table Table (Id int, Name nvarchar(20), DOB Date)
+            as
+            Begin
+                Insert into @Table
+                Select Id, Name, Cast(DateOfBirth as Date) From tblEmployees
+                Return
+            End
+
+        execution:
+            Select * from fn_MSTVF_GetEmployees();
+
+    Inline vs Multi-Statement:
+        1. In an Inline Table Valued function, the RETURNS clause cannot contain the structure of the table, the function returns. 
+            Where as, with the multi-statement table valued function, we specify the structure of the table that gets returned
+        2. Inline Table Valued function cannot have BEGIN and END block, where as the multi-statement function can have.
+        3. Inline Table valued functions are better for performance, than multi-statement table valued functions. 
+            If the given task, can be achieved using an inline table valued function, always prefer to use them, 
+            over multi-statement table valued functions.
+        4. It's possible to update the underlying table, using an inline table valued function, 
+            but not possible using multi-statement table valued function.
+
+        Reason for improved performance of an inline table valued function:
+            Internally, SQL Server treats an inline table valued function much like it would a view and treats a 
+                multi-statement table valued function similar to how it would a stored procedure.
+
+Deterministic function:
+    It always return the same result anytime they are called with a specific set of input values and given the same state of database.
+    eg: Square(), Power(), Sum(), Avg(), Count()
+    All aggreagte functions are deterministic.
+Nondeterministic function:
+    It may return different results each time they are called with a specific set of input values 
+        even if the database state that they access remains the same.
+    eg: GetDate() and CURRENT_TIMESTAMP
+
+Rand() is a nondeterministic function, but if seed value is given, then the function beco0mes deterministic,
+    as the same value gets returned for the same seed value.
+
+Note:
+    To encrypt the function use WITH ENCRYPTION option while creating/altering the function.
+    WITH SCHEMABINDING - the base objects cannot be modified in any way that would affect the function definition.
+        The function definition itself must first be modified or dropped to remove dependencies on the object that is to be modified.
+
+Temporary tables:
+    They are very similar to permanent tables.
+    They are created in the database and remain in the database permanently, until user delete them.
+    On the other hand, temporary tables get created in the TempDB and are automatically deleted, when they are no longer used.
+
+    Types:
+        Global temporary tables
+        Local temporary tables
+
+    Local Temporary tables:
+        Temporary tables are created in the TempDB.
+        Query the sysobjects system table in TempDB.
+        The name of the table, is suffexed with lot of underscores and a random number.
+        For the above reason, we have to use like operator in the query.
+        To create a local temporary table, prefix the name of the table with 1 pound(#) symbols.
+
+        A local temporary table is avalaiable, only for the connection that has created the table.
+        A local temporary table is automatically dropped, when the connection that has created it, is closed.
+        If the user wants to explicitly drop the temporary table, it be done by using:
+            DROP TABLE #tablename
+
+        If the temporary table, is creaed inside the stored procedure, it get's dropped automatically 
+            upon the completion of stored procedure execution.
+        It is possible for different connections, to create a local temporary table with the same name.
+
+    Global Temporary Tables:
+        To create a global temporary table, prefix the name of the table with 2 pound(##) symbols.
+        They are visible to all the connections of the sql server.
+        They are destroyed only when the last connection referencing the table is closed.
+
+        These kind of tables should have their name as unique.
+        In the name of global temp table there will be no random numbers suffixed at the end of the table name.
+
+    Local vs Global temp tables:
+        1. Local Temp tables are prefixed with single pound (#) symbol, 
+            where as gloabl temp tables are prefixed with 2 pound (##) symbols.
+        2. SQL Server appends some random numbers at the end of the local temp table name, 
+            where this is not done for global temp table names.
+        3. Local temporary tables are only visible to that session of the SQL Server which has created it, 
+            where as Global temporary tables are visible to all the SQL server sessions
+        4. Local temporary tables are automatically dropped, when the session that created the temporary tables is closed, 
+            where as Global temporary tables are destroyed when the last connection that is referencing the global temp table is closed.

@@ -1,0 +1,163 @@
+[ref]: https://csharp-video-tutorials.blogspot.com/p/free-sql-server-video-tutorials-for.html
+
+Connecting to SQL Server:
+    It can be done by SSMS. It is client tool to connect to DB Server.
+
+Create Database:
+    Using UI:
+        Right click on server instance and click "create new database",New Database dialoguebox will be opened.
+        Enter the database name and click ok, the new database will be created.
+    Using Query:
+        Create Database <database_name>
+
+    After creating a data base, two files will be created for each database.
+    They are:
+        <database_name>.mdf - Data File(contains actual data)
+        <database_name>_log.ldf - Transaction log file(used to recover database)
+    
+Rename Database:
+    Using UI:
+        Right click on database, select rename. Rename database and click enter.
+    Using Query:
+        Two ways:
+            using alter query- Alter Database <database_name_old> modify Name=<database_name_new>
+            using system stored procedure - sp_renameDB '<database_name_old>','<database_name_new>'
+
+Drop or Delete Database:
+    Using UI:
+        Right click on database, select delete.
+    Using Query:
+        Drop Database <database_name>
+    
+    On deleting database, mdf and ldf files will be deleted from the folder path.
+    It's not possible to delete the database while the database is in use by the another user, as it throws error.
+    Put the database in single user mode to avoid error while deletion of database.
+
+    To put database in single user mode:
+        Alter Database <database_name> set SINGLE_USER with Rollback Immediate
+
+    "with Rollback Immediate" is used to rollback the incomplete transaction executed by another user while the user access is changing.
+
+Create Table:
+    Using UI:
+        Expland "Tables" and right click on it, click create table.
+        A new table UI will be shown, enter the column name, data type and check if need to allow nulls in allow nulls.
+        Press ctrl+s and give the table name and click ok.
+        To Set Primary key:
+            Select the column, right click on it and select set primary key.(while creating table)
+    Using Query:
+        create table <table_name>(
+            column_name_1 datatype(size) <not null/null> <Primary Key/foreign key/ unique key>,
+            column_name_2 ............
+        )
+
+        Note that select the correct database name before executing (or) use the below statement before create query:
+            Use [<database_name>]
+            Go
+
+Add Foreign key relationship:
+    Using UI:
+        Right click on the table, select design.
+        Right click on the column and select relationships, foreign key relationship dialogue box will appear.
+        Click on add, clcik browse button in "Tables and Columns Specification", select the primary key table and column, then select foreign key table and column.
+    Using Query:
+        Alter table <foreignkey_table_name> add constraint <constraint_name> Foreign Key (<foreignkey_column>) 
+            references <primarykey_table_name>(<primarykey_column>)
+
+Add values in Table:
+    Using UI:
+        Right click on the table and select edit top 200 rows.
+        Now using the grid view add values and click on save icon or ctrl+s.
+    Using Query:
+        Insert into <table_name> (column_name_1,column_name_2,....)
+        values(value1,value2,....)
+
+Adding Default Constraint:
+    Using Query:
+        Alter table <table_name> add constraint <constraint_name>
+        Default <value> for <column_name>
+        
+        Note: If we supply value, even if it null, then the supplied value will be inserted instead of default value.
+
+Dropping a constraint:
+    Using Query:
+        alter table <table_name>
+        drop constraint <contraint_name>
+
+Adding a new column with default constraint:
+    Using Query:
+        alter table <table_name>
+        add <column_name> <datatype>(<size>) <null/not null>
+        constraint <constraint_name> default <column_name>
+
+Cascading Referential Integrity:
+    Cascading referential integrity constraint allows to define the actions Microsoft SQL Server 
+        should take when a user attempts to delete or update a key to which an existing foreign key points.
+
+    Options when setting up Cascading referential integrity constraint:
+        No Action: 
+            This is the default behaviour. 
+            No Action specifies that if an attempt is made to delete or update a row with a key referenced by foreign keys 
+                in existing rows in other tables, an error is raised and the DELETE or UPDATE is rolled back.
+        Cascade:
+            Specifies that if an attempt is made to delete or update a row with a key referenced by foreign keys in existing rows 
+                in other tables, all rows containing those foreign keys are also deleted or updated.
+        Set NULL:
+            Specifies that if an attempt is made to delete or update a row with a key referenced by foreign keys in existing rows 
+                in other tables, all rows containing those foreign keys are set to NULL.  
+        Set Default: 
+            Specifies that if an attempt is made to delete or update a row with a key referenced by foreign keys in existing rows 
+                in other tables, all rows containing those foreign keys are set to default values.
+
+Adding check constraint:
+    Using Query:
+        alter table <table_name>
+        add constraint <constraint_name> check <boolean_expression>
+    Using UI:
+        Expand the table,right click on the constraint and select new constraint.
+        A check constraint window will open, enter the expression and click close.
+
+
+Identity Column:
+    If a column is marked as an identity column, then the values for this column are automatically generated, 
+        when you insert a new row into the table.
+
+    Using UI:
+        Select the column and select the column properties. 
+        In "Identity Specification", select yes.
+        Properties:
+            Identity Increment - used to mention increment by value
+            Identity Seed - starting range of value
+    Using Query:
+        alter table <table_name>
+        modify column <column_name> <data_type>(<size>) Identity(<Identity_Increment>,<Identity_Seed>)
+    
+    To explicitly set value for identity column, IDENTITY_INSERT should be ON.
+    Follow the command to do so:
+        SET IDENTITY_INSERT <table_name> ON
+    Once IDENTITY_INSERT is turned on, we have to supply the value all the time.
+
+    To reset the identity value,
+        DBCC CHECKIDENT(<table_name>, RESEED, 0)
+
+    Ways to get the last generated identity column value:
+        SCOPE_IDENTITY() - returns the last identity value that is created in the same session and in the same scope
+        @@IDENTITY - returns the last identity value that is created in the same session and across any scope
+        IDENT_CURRENT('<table_name>') - returns the last identity value that is created for a specific table across any session and any scope
+
+Unique Key Constraint:
+    To enforce uniqueness of the column(the column shouldn't allow any duplicate values).
+
+    Using Query:
+        Alter table <table_name>
+        add constraint <constraint_name> Unique(<column_name>)
+    Using UI:
+        Right click on table, select design.
+        Right click on the column and select "Indexes and Keys".
+        Click add, select the column to apply unique key.
+        select "Is Unique" to "yes" and "Type" to "Unique Key".
+        Click close and save table.
+
+Primary key VS Unique Key:
+    A table can have only one primary key, but more than one unique key
+    Primary key does not allow nulls, where as unique key allows one null

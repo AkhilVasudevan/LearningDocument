@@ -1,0 +1,29 @@
+Normalization:
+    The process of organizing data to minimize data redundancy, which in turn ensures data consistency.
+
+    Problems of data redundancy:
+        Disk space wastage
+        Data inconsistency
+        DML queries ca become slow
+    
+    Database normalization is a step by step process.
+    There are 6 normal forms, 1NF through 6NF.
+    Most databases are in third normal form(3NF).
+    There are certain rules, that each normal form should follow.
+
+    First Normal Form(1NF):
+        The data in each column should be atomic.
+        No multiple values, separated by comma.
+        The table does not contain any repeating column groups.
+        Identify each record uniquely using primary key.
+
+    Second Normal Form(2NF):
+        The table meets all the conditions of 1NF.
+        Move redundant data to a seperate table.
+        Create relationshi between these tables using foreign keys.
+
+    Third Normal Form(3NF):
+        Meets all the conditions of 1NF and 2NF.
+        Does not contain columns that are not fully dependent upon the primary key.
+    
+    

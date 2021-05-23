@@ -1,0 +1,146 @@
+MongoDB:
+    MongoDB helps us to store things more naturally in a format tht fits nicely  into modern applications.
+    It is a document model storage server.
+
+Collections:
+    Collections in MongoDB are an ideal way to group similar Document types
+    Collections contains documents.
+    Collections are created automatically when data is inserted.
+    Collection is more like a table in SQL.
+    Collection names should follow UTF-8 rules, as it should not contain blankspace.
+
+Documents:
+    Documents or field-value pairs stored in JSON-like format called, BSON which stands for Binary JSON.
+    Dcocument can store Strings, Arrays, Objects, Documents, Numbers, Booleans, Etc.
+
+To run mongodb server manually,
+    c: -> Program Files -> MOngoDB -> Server -> (version_number) -> bin
+    open command prompt inthe above location and type the below command:
+        mongodb.exe --config mongod.cfg
+
+    Type mongo and enter, mongodb interface will be found in cmd prompt.
+
+show DBS; 
+    list all the DBs available along with the momory used by each DBs.
+
+To import existing collection to DB,
+    mongoimport.exe /db:<db_name> <collection_name>.json
+
+use <database_name>; 
+    All the commands after this will use the mentioned database.
+    It is also used to create database.
+
+show collections; 
+    List the collections in the database.
+
+db.getName(); [or] db;
+    It shows which database instance is currently used.
+
+db.dropDatabase();
+    It is used to drop the current instance database.
+    Use <database_name> has to used to mention which database have to be deleted.
+
+To insert the document:
+    doc={};
+    db.<collection_name>.insertOne(doc)
+
+    On inserting, _id will also be generated as unique id.
+    _id will also contains an encoded datetime
+
+To get the document from collection:
+    db.<collection_name>.find();
+    db.<collection_name>.find().pretty(); - displays data in pretty json format
+
+    db.<collection_name>.find({"column_name":"value"});
+        It will fetch all the documents which has the column name with the given value.
+    db.<collection_name>.find({"column_name":"value","column_name":"value"});
+        We can also mention multiple column and its values to fetch based on multiple values.
+
+    db.<collection_name>.find({"column_name":"value"},{"column_name":[1|0]});
+        Second parameter haas been used to display/exclude the field from the document on select.
+    
+    db.<collection_name>.find({"column_name":{$regex: <regular_expression>}});
+        Instead of like, % in SQL, we use regular expression for likely search query.
+
+    db.<collection_name>.find().count();
+        It will return the number of documents in the collection.
+
+    db.<collection_name>.find().limit(<size>);
+        It will limit the number of documents to given size.
+
+    db.<collection_name>.find().sort({"column_name":[1|-1]});
+        Sort by column name, 1 is ascending, -1 is descending.
+    
+    db.<collection_name>.find().skip(<count>);
+        Skips count number of documents.
+
+    MongoDB has a number of operators that can be used both on fields and arrays 
+        in queries to conditionally filter results to perform aggregation.
+
+    Operators:
+        $gt - greater than
+        $lt - lesser than
+        $lte - lesser than or equal to
+        $gte - greater than or equal to
+        https://docs.mongodb.com/manual/reference/operator/query/
+
+    db.<collection_name>.find("column_name":{[arithmetic_operators]:"value"});
+        It helps to make comparison of values using operators.
+
+To update document:
+    db.<collection_name>.updateOne({<filter>},{$set:{<update_column>:<update_value>}})
+        It will update one instance of the document with the matching filter.
+        It is possible to add a new field and value using the above update command.
+
+    db.<collection_name>.updateOne({<filter>},{$unset:{<update_column>:[1|0]}})
+        It is possible to remove the field from document by above command using unset.
+        1 - true to remove, 0- false to remove 
+
+    db.<collection_name>.updateOne({<filter>},{$inc:{<update_column>:<increment_by_value>}})
+        It is possible to increment the value of the column by "increment_by_value".
+        It can be positive as well as negative, decimal as well as whole number.
+
+    db.<collection_name>.updateOne({<filter>},{[$push|$pull]:{<update_column>:<value>}})
+        It is possible to insert or delete the value in the array element of the document.
+
+To delete document:
+    db.<collection_name>.deleteOne({<filter>})
+        It will the delete only one document which match the filter.
+
+Data and Schema modeling:
+    Data that is accessed together should be stored together.
+    Properly indexing data is important for database performance.
+
+    db.<collection_name>.  and press tab
+        It will list all the commands that can be used in the collection.
+
+    db.<collection_name>.getIndexes();
+        It will list all the indexes available in the collection.
+
+    db.<collection_name>.find().explain("executionStats");
+        It will display the execution status of the query.
+
+    db.<collection_name>.createIndex({<column_name>:[1|-1]});
+        It will create an index on the column. 1 : asc, -2 : dsc
+    
+    db.<collection_name>.dropIndex([<index_name>|{<column_name>:[1|-1]}]);
+        It will delete the index
+
+GridFS:
+    MongoDB has built-in support for storing files within the database itself called GridFS.
+    GridFS is the mongoDB specification for storing and retrieving large files such as images, audio files, video files, etc. 
+    It is kind of a file system to store files but its data is stored within MongoDB collections. 
+    GridFS has the capability to store files even greater than its document size limit of 16MB.
+
+    mongofiles --db=<dat_name> list --quiet
+        It will list the files available in database.
+    
+    mongofiles put <file_name> --db=<db_name>
+        It will add files to the GridFS
+    mongofiles put <file_name> --db=<db_name>
+        It will get the file from GridFS
+    mongofiles delete <file_name> --db=<db_name>
+        It will delete the file from GridFS
+
+    
+    

@@ -1,0 +1,158 @@
+Stored Procedure:
+    A group of T-SQL statements that can be reused over and over again.
+    
+    Pseudo Code:
+        {CREATE|ALTER} {PROCEDURE|PROC} <procedure_name>
+        @<parameter1> <data_type>(<size>),@<parameter2> <data_type>(<size>),....
+        AS
+        BEGIN
+            //statements(body)
+        END
+
+    To execute:
+        {EXEC|EXECUTE} <procedure_name> [@<parameter1> = value, @<parameter2> = value,....]
+
+    To view the text, of the stored procedure:
+        Using UI:
+            Right click on the stored procedure, select "script Procedure as" -> create to -> new query editor window.
+        Using Query:
+            {EXEC|EXECUTE} sp_helptext <procedure_name>
+
+    To drop:
+        Drop {PROC|PROCEDURE} <procedure_name>
+
+    To encrypt procedure:
+        {CREATE|ALTER} {PROCEDURE|PROC} <procedure_name>
+        @<parameter1> <data_type>(<size>),@<parameter2> <data_type>(<size>),....
+        WITH ENCRYPTION
+        AS
+        BEGIN
+            //statements(body)
+        END
+
+    An encrypted stored procedure cannot be viewed.
+    
+    Output Parameters:
+        To create stored procedure with output parameter, we use the keyword OUT or OUTPUT.
+        
+        Code:
+            {CREATE|ALTER} {PROCEDURE|PROC} <procedure_name>
+            @<parameter1> <data_type>(<size>),@<parameter2> <data_type>(<size>) {OUTPUT|OUT}
+            AS
+            BEGIN
+                SELECT @<parameter2> = <column_name> from <table_name>
+            END
+
+        Execution:
+            Declare @<output_variable> <data_type>(<size>)
+            {EXEC|EXECUTE} <procedure_name> @<output_variable> {Output|Out}
+            Print @<output_varibale>
+
+        Note that output_variable and output_parameter should be of same data type and size.
+        If output keyword is not used while execution then it will be treated as NULL.
+        
+        example:
+            create procedure spGetEmployeeCountByGender
+            @Gender nvarchar(20),
+            @EmployeeCount int output
+            as
+            begin
+                select @EmployeeCount=count(id)
+                from tblEmployee
+                where Gender=@Gender
+            end
+
+            Declare @EmployeeTotal int
+            EXECUTE spGetEmployeeCountByGender @EmployeeCount = @EmployeeTotal Output, @Gender='Male'
+            Print @EmployeeTotal
+
+    Some useful system stored procedure:
+        sp_help <procedure_name/table_name/views/function/trigger/...> - view the information about the stored procedure. 
+            ALT+F1 can also be used on highlightinh the name of object.
+            It can be used with any database object, like tables, views, SP's, triggers etc.
+        sp_helptext <procedure_name/function/trigger/...> - view the text of the stored procedure.
+        sp_depends <procedure_name/table_name/views/function/trigger/...> - view the dependencies of the stored procedure.
+            This system SP is very useful, especially if you want to check, 
+                if there are any stored procedures that are referencing a table that you are about to drop. 
+            sp_depends can also be used with other database objects like table etc.
+
+    Output parameters or return values:
+        Whenever stored procedure has been executed, it returns an integer status variable. 
+        Usually zero indicates success and non-zero indicates failure.
+
+        Stored Procedure always return integer value only, no other data type cannot be returned.
+        Stored Procedure will return only one value.
+        Stored Procedure can have any number of output variables and can be of any data type.
+
+        In general , RETURN values are used to indicate success or failure of stored procedure, 
+            especially when dealing with nested stored procedures.
+
+        Query:
+            {CREATE|ALTER} {PROCEDURE|PROC} <procedure_name>
+            @<parameter1> <data_type>(<size>),@<parameter2> <data_type>(<size>),....
+            AS
+            BEGIN
+                RETURN(statement)
+            END
+        
+        Execution:
+            Declare @<return_variable> <data_type>(<size>)
+            {Exec|Execute}  @<return_variable> = <procedure_name>
+            Print  @<return_variable>
+
+        example for return value:
+            Code:
+                Create Procedure spGetTotalCountOfEmployees1
+                @TotalCount int output
+                as
+                Begin
+                    Select @TotalCount = COUNT(ID) from tblEmployee
+                End
+            
+            Execution:
+                Executing spGetTotalCountOfEmployees1 returns 3.
+                    Declare @TotalEmployees int
+                    Execute spGetTotalCountOfEmployees @TotalEmployees Output
+                    Select @TotalEmployees
+
+            Code:
+                Re-written stored procedure using return variables
+                    Create Procedure spGetTotalCountOfEmployees2
+                    as
+                    Begin
+                        return (Select COUNT(ID) from Employees)
+                    End
+
+            Execution:
+                Executing spGetTotalCountOfEmployees2 returns 3.
+                    Declare @TotalEmployees int
+                    Execute @TotalEmployees = spGetTotalCountOfEmployees2
+                    Select @TotalEmployees
+
+    Advantages of stored procedure:
+        Execution plan retention and reusability:
+            stored procedure are compiled and their execution plan is cached and used again.
+        Reduces network traffic:
+            A call to execute stored procedure is needed instead of sending SQL query.
+        Code reusability and better maintainability:
+            Change in one place of stored procedure will provide reusability and maintainability.
+        Better Security:
+             A database user can be granted access to an SP and prevent them from executing direct "select" statements against a table.  
+             This is fine grain access control which will help control what data a user has access to.
+        Avoids SQL injection attack
+
+    Optional Parameters:
+        To make parameters optional assign null or default value to the parameter of the stored procedure.
+        
+        Example:
+            CREATE PROCEDURE spSearchEmployees
+            @Name nvarchar(50) = NULL,
+            @Email nvarchar(50) = NULL
+            AS
+            BEGIN
+                SELECT * FROM tblEmployee
+                WHERE 
+                (Name = @Name or @Name IS NULL)
+                AND
+                (Email = @Email or @Email IS NULL)
+            END

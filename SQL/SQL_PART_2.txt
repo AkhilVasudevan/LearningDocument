@@ -1,0 +1,237 @@
+Select statement:
+    Select All:
+        Query:
+            select * from <table_name>
+        Autogenerate query:
+            right click on the table, select "script table as"->""select to"->"new query editor window"
+    
+    Select Distinct Rows:
+        Query:
+            select distinct <column_name> from <table_name>
+
+        When distinct is used with multiple columns, then the combination of both columns will be distinct.
+
+    Using where clause:
+        select * from <table_name> where <expression>
+
+        Where clause expression operators:
+            = equalto
+            != or <> not equalto
+            > greater than
+            < lesser than
+            >= greater than or equalto
+            <= lesser than or equalto
+            IN specify a list of values
+            BETWEEN specify a range
+            LIKE specify a pattern
+            NOT not in a list, range, etc.
+            % specifies zero or more characters
+            - specifies exactly one characters
+            [] any character with in the brackets
+            [^] not any character with in the brackets
+
+    Using orderby:
+        Query:
+            select * from <table_name> order by <column_name> {desc|asc}
+
+    Using Top n:
+        Query:
+            select top n * from <table_name>
+            select top n percent * from <table_name>
+
+        It is possible to select rows based on absolute number and percentage using top.
+
+    Aggregate functions:
+        Ref: https://docs.microsoft.com/en-us/sql/t-sql/functions/aggregate-functions-transact-sql?view=sql-server-ver15
+
+    Using Groupby:
+        Used to group a selected set of rows into a set of summary rows by the values of one or more columns or expressions.
+        It is always used in conjunction with one or more aggregate function.
+        Query:
+            select <column_name_1>,<aggregate>(<column_name_2>) from <table_name> group by <column_name_1>
+
+        Using Multiple aggregation is also possible.
+        eg: select city, gender, sum(salary) as totalsalary from employee_table group by city,gender
+        WHERE clause is used to filter rows before aggregation, where as HAVING clause is used to filter groups after aggregations.
+
+    Difference between WHERE and HAVING:
+        1. WHERE clause can be used with - Select, Insert, and Update statements, 
+            where as HAVING clause can only be used with the Select statement.
+        2. WHERE filters rows before aggregation (GROUPING), 
+            where as, HAVING filters groups, after the aggregations are performed.
+        3. Aggregate functions cannot be used in the WHERE clause, unless it is in a sub query contained in a HAVING clause,
+             whereas, aggregate functions can be used in Having clause.
+
+    Joins:
+        Used to retirve data from 2 or more related tables.
+        Types:
+            Inner Join
+            Outer Join
+                Left join or left outer join
+                Right join or right outer join
+                Full join or full outer join
+            Cross join
+        
+        Inner Join:
+            Returns matching rows between two tables.
+            Query:
+                Select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                {INNER JOIN|JOIN} <table_name_2>
+                on <table_name_1_column> = <table_name_2_column>
+
+        Left Outer Join:
+            Returns the matching rows+non matching rows from the left table.
+            Query:
+                Select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                {LEFT JOIN|LEFT OUTER JOIN} <table_name_2>
+                on <table_name_1_column> = <table_name_2_column>
+
+        Right Outer Join:
+            Returns the matching rows+non matching rows from the right table.
+            Query:
+                Select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                {RIGHT JOIN|RIGHT OUTER JOIN} <table_name_2>
+                on <table_name_1_column> = <table_name_2_column>
+
+        Full Outer Join:
+            Returns all rows from the left and right tables.
+            Query:
+                Select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                {FULL JOIN|FULL OUTER JOIN} <table_name_2>
+                on <table_name_1_column> = <table_name_2_column>
+
+        Cross Join:
+            Returns the cartesian product of the two tables involved in the join.
+            Query:
+                Select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                CROSS JOIN <table_name_2>
+
+        Advanced Joins:
+            Getting only non matching rows from table.
+            Query:
+                select <table_name_1_columns>,<table_name_2_columns>
+                from <table_name_1>
+                {LEFT JOIN | RIGHT JOIN | FULL JOIN} <table_name_2>
+                on <table_name_1_column> = <table_name_2_column>
+                where [ <table_name_1_column> IS NULL | <table_name_2_column> IS NULL | 
+                            <table_name_1_column> IS NULL OR <table_name_2_column> IS NULL>]
+    
+        Self Join:
+            Joining a table with itself.
+            classified as:
+                Inner self join
+                Outer self join(left, right, full)
+                Cross self join
+            examples: (tblEmployee table with EmployeeId,Name,ManagerId)
+                --Left outer self join:
+                    Select E.Name as Employee, M.Name as Manager
+                    from tblEmployee E
+                    Left Join tblEmployee M
+                    On E.ManagerId = M.EmployeeId
+                --Inner Self Join tblEmployee table:
+                    Select E.Name as Employee, M.Name as Manager
+                    from tblEmployee E
+                    Inner Join tblEmployee M
+                    On E.ManagerId = M.EmployeeId
+                --Cross Self Join tblEmployee table:
+                    Select E.Name as Employee, M.Name as Manager
+                    from tblEmployee
+                    Cross Join tblEmployee
+
+    Three ways to replace NULL values:
+        ISNULL() function
+        CASE statement
+        COALESCE() function
+
+        Examples:
+            Replacing NULL value using ISNULL() function: We are passing 2 parameters to IsNULL() function. 
+            If M.Name returns NULL, then 'No Manager' string is used as the replacement value.
+                SELECT E.Name as Employee, ISNULL(M.Name,'No Manager') as Manager
+                FROM tblEmployee E
+                LEFT JOIN tblEmployee M
+                ON E.ManagerID = M.EmployeeID
+
+            Replacing NULL value using CASE Statement:
+                SELECT E.Name as Employee, CASE WHEN M.Name IS NULL THEN 'No Manager' 
+                ELSE M.Name END as Manager
+                FROM  tblEmployee E
+                LEFT JOIN tblEmployee M
+                ON   E.ManagerID = M.EmployeeID
+
+            Replacing NULL value using COALESCE() function: COALESCE() function, returns the first NON NULL value.
+                SELECT E.Name as Employee, COALESCE(M.Name, 'No Manager') as Manager
+                FROM tblEmployee E
+                LEFT JOIN tblEmployee M
+                ON E.ManagerID = M.EmployeeID
+    
+    COALESCE():
+        Returns first non null value.
+        eg:
+            select id,coalesce(firstname,middlename,lastname) as name from tblEmployee
+
+            id	firstname	middlename	lastname		||	 id	name
+            1	Sam	        NULL	    NULL			||    1	Sam
+            2	NULL	    Todd	    Tanzan			||    2	Todd
+            3	NULL	    NULL	    Sara			||    3	Sara
+            4	Ben	        Parker	    NULL			||    4	Ben
+            5	James	    Nick	    Nancy			||    5	James
+
+    UNION and UNION ALL:
+        UNION and UNION ALL operators in SQL Server are used to combine the result-set of two or more SELECT queries.
+        UNION and UNION ALL to work, the number, data types, and the order of the columns in the select statement should be same.
+
+        Query:
+            Select <column_name_1>,<column_name_2> from <table_name_1>
+            {UNION|UNION ALL}
+            Select <column_name_1>,<column_name_2> from <table_name_2>
+        
+        Differences between UNION and UNION ALL:
+            UNION removes duplicate rows, where as UNION ALL does not. 
+            When use UNION, to remove the duplicate rows, sql server has to to do a distinct sort, which is time consuming. 
+                For this reason, UNION ALL is much faster than UNION.
+        
+        Sorting results of a UNION or UNION All:
+            ORDER BY clause should be used only on the last SELECT statement in the UNION query.
+        
+    UNION vs JOIN:
+        JOINS and UNIONS are different things. 
+        UNION combines the result-set of two or more select queries into a single result-set which includes 
+            all the rows from all the queries in the union, 
+            where as JOINS, retrieve data from two or more tables based on logical relationships between the tables. 
+        In short, UNION combines rows from 2 or more tables, where JOINS combine columns from 2 or more table.
+
+    Subqueries:
+        A subquery is simply a select statement, that returns a single value and can be 
+            nested inside a SELECT, UPDATE, INSERT, or DELETE STATEMENT.
+        It is also possible to nest a subquery inside another subquery.
+        According to MSDN, subqueries can be nested upto 32 levels.
+
+        Subqueries are always enclosed in paranthesis and are also called as inner queries, 
+            and the query containing the subquery is called as outer query.
+        The columns from a table that is present only inside a subquery, cannot be used in the SELECT list of the outer query.
+
+    Correlated Subqueries:
+        If the subquery depends on the outer query for its values, then that subquery is called as correlated subquery.
+        Correlated subqueries get executed, once for every row that is selected by the outer query.
+        Correlated subquery cannot be executed independently of the outer query.
+        
+    Subquery vs Joins:
+        According to MSDN, in most cases, there is usually no performance difference between 
+            queries that uses sub-queries and equivalent queries using joins.
+        
+        According to MSDN, in some cases where existemce ,must be checked, a join procedures better performance.
+        Otherwise, the nested query must be processed for each result of the outer query.
+        In such cases, a join approach would yield better results.
+
+        In general joins work faster that is generated by SQL Server.
+        It does not matter how we have written the query, SQL Server will always transform it on an execution plan.
+        If it is "smart" enough to generate the same plan from both queries, you will get the same result.
+
+        Turn on client statistics and execution plan to see the performance of each option to make decision.
+
+        

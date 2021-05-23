@@ -1,0 +1,137 @@
+Transaction:
+    A transaction is a group of commands that change the data stored in a database.
+    A transaction is treated as a single unit of work.
+
+    When a multiple statements works on same data there occurs the concurrency issues.
+    Common concurrency problems:
+        Dirty Reads
+        Lost Updates
+        Nonrepeatable Reads
+        Phantom Reads
+
+    To solve concurrency, we should allow only one user to access the data at any time.
+    Since it is very hard to manage database with one user access at a time.
+    So SQL SERVER PROVIDES Isolation of transactions.
+    They are:
+        Read Uncommitted
+        Read Committed
+        Repeatable Read
+        Snapshot
+        Serialiable
+
+    The isolation level that you choose for your transaction, defines the degree to which one transaction must be 
+        isolated from resource or data modifications made by other transactions. 
+    Depending on the isolation level you have chosen you get varying degrees of performance and concurrency problems. 
+    The table here has the list of isoltaion levels along with concurrency side effects.
+
+    Isolation Level	  |  Dirty Reads	|    Lost Update	|    Nonrepeatable Reads	|    Phantom Reads
+    ------------------|-----------------|-------------------|---------------------------|-----------------
+    Read Uncommitted  |	    Yes         |    Yes            |       Yes                 |    Yes
+    Read Committed	  |      No         |    Yes            |       Yes                 |    Yes
+    Repeatable Read	  |      No         |     No            |       No                  |    Yes
+    Snapshot	      |      No         |     No            |       No                  |    No
+    Serializable	  |      No         |     No            |       No                  |    No
+
+    If you choose the lowest isolation level (i.e Read Uncommitted), it increases the number of concurrent transactions 
+        that can be executed at the same time, but the down side is you have all sorts of concurrency issues. 
+    On the other hand if you choose the highest isolation level (i.e Serializable), you will have no concurrency side effects, 
+        but the downside is that, this will reduce the number of concurrent transactions that can be executed  
+        at the same time if those transactions work with same data.
+
+    Code:
+        Set Transaction Isolation Level <Isolation_level>
+
+        Dirty Read:
+            A dirty read happens when one transaction is permitted to read data that has been modified by another transaction 
+                that has not yet been committed.
+            In most cases thsi could not cause a problem.
+            However,if the first transaction is rolled back after the second reads the data, teh second transaction has 
+                dirty data that does not exists antmore.
+            
+            It is possible to read uncommitted data here.
+            Example:
+                Set Transaction isolation level read uncommitted
+                Set * from tblInventory where ID=1
+            The above example can able to read dirty data(uncommitted data).
+
+            Read Uncommitted transactioon isolation level is the only isolation level that has dirty road side effect.
+            This is the least restrictive of all the isolation levels.
+            When this transaction isolation level is set, it is possible to read uncommitted or dirty data.
+            Another option to read dirty data is by using NOLOCK table hint.
+            The query below is equivalent to above example:
+                select * from tblInventory (NOLOCK) where Id=1
+
+        Lost Update:
+            Lost Update probelm happens when 2 transactions read and update the same data.
+
+            Example:
+                Set Transaction Isolation Level Repeatable Read
+
+            Both Read Uncommitted and Read Committed transaction isolation levels have the lost update side effect.
+            Repeatable Read, Snapshot and Serializable isolation levels does not hav this side effect.
+            The repeatable read isolation level uses additional locking on rows that are read by current transaction, 
+                and prevents them from being updated or deleted elsewhere.
+            This solves the lost update problem.
+
+        Nonrepeatable read:
+            It happens when one transaction reads the same data twice and another transaction updates that data 
+                in between the first and second read of transaction one.
+            
+            Example:
+                set transaction isolation level repeatable read
+
+        Phantom read:
+            It happens when one transaction executes a query twice and it gets a different number of rows in the result set each time.
+            This happens when a second transaction inserts a new row that matches the WHERE clause of the query 
+                executed by the first transaction.
+
+            To fix this problem, set transaction isolation level to serializable.
+            This will place a range lock on the select rows, which prevents any other transaction from inserting 
+                new rows with in that range.
+
+    Difference between repeatable read and serializable
+        Repeatable read prevents only non-repeatable read. 
+        Repeatable read isolation level ensures that the data that one transaction has read, will be prevented 
+            from being updated or deleted by any other transaction, but it doe not prevent new rows from 
+                being inserted by other transactions resulting in phantom read concurrency problem.
+
+        Serializable prevents both non-repeatable read and phantom read problems. 
+        Serializable isolation level ensures that the data that one transaction has read, will be prevented 
+            from being updated or deleted by any other transaction. It also prevents new rows from being inserted by other transactions, 
+            so this isolation level prevents both non-repeatable read and phantom read problems.
+
+    Snapshot Isolation Level:
+        Just like serializable isolation level, snapshot isolation level does not have any concurrency side effects.
+        To set snapshot isolation level:
+            ALTER DATABASE <database_name>
+            SET ALLOW_SNAPSHOT_ISOLATION ON
+
+        What is the difference between serializable and snapshot isolation levels
+            Serializable isolation is implemented by acquiring locks which means the resources are locked for the duration 
+                of the current transaction. 
+            This isolation level does not have any concurrency side effects but at the cost of significant reduction in concurrency.
+
+            Snapshot isolation doesn't acquire locks, it maintains versioning in Tempdb. 
+            Since, snapshot isolation does not lock resources, it can significantly increase the number of 
+                concurrent transactions while providing the same level of data consistency as serializable isolation does.
+    
+    Read Committed Snapshot Isolation Level:
+        It is not a different isolation level.
+        It is the different way of implementing read committed isolation level.
+        One problem we have with read committed isolation level is that, it blocks the transaction if it is trying to read the data,
+            that another transaction is updating at the same time.
+
+        To use READ_COMMITTED_SNAPSHOT isolation, enable it at the database level:
+            ALTER DATABASE <database_name>
+            SET READ_COMMITTED_SNAPSHOT ON
+
+    Read Committed Snapshot Isolation	                |   Snapshot Isolation
+    ----------------------------------------------------|--------------------------------------------------------
+        No update conflicts	                            |       Vulnerable to update conflicts
+        Works with existing applications                |       Application change may be required to use 
+            without requiring any change                |           with an existing application
+            to the application                          |
+        Can be used with distributed transactions	    |       Cannot be used with distributed transactions
+        Provides statement-level read consistency	    |       Provides transaction-level read consistency
+
+    

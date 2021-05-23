@@ -1,0 +1,192 @@
+Cursors:
+    RDBMS, including sql server are very good at handling data in SETS.
+    However, if there is ever a need to process the rows, on a row-by-row basis, then cursors are the choice.
+    Cursors are very bad for performace, and sould be avoided always.
+    Most of the time, cursors can be very easily replaced using joins.
+
+    Types:
+        Forward-Only
+        Static
+        Keyset
+        Dynamic
+
+    A cursor is nothing more than a pointer to a row.
+
+    Example:
+        DECLARE ProductCursor CURSOR FOR
+        SELECT id,Name from tblProducts where Id<=1000
+
+        OPEN ProductCursor
+        FETCH NEXT FROM ProductCursor into @ProductId,@Name
+
+        WHILE(@@FETCH_STATUS=0)
+        BEGIN
+            FETCH NEXT FROM ProductCursor INTO @ProductId,@Name
+        END
+
+        CLOSE ProductCursor
+
+    Code:
+        DECLARE <cursor_name> CURSOR FOR
+        <query_procedures>
+            [FETCH NEXT FROM <cursor_name> INTO <variables>]
+        CLOSE <cursor_name>
+        DEALLOCATE <cursor_name>
+
+Replacing cursors with joins:
+    
+    Example:
+        Cursor:
+            Declare @ProductId int
+            
+            -- Declare the cursor using the declare keyword
+            Declare ProductIdCursor CURSOR FOR 
+            Select ProductId from tblProductSales
+
+            -- Open statement, executes the SELECT statment
+            -- and populates the result set
+            Open ProductIdCursor
+
+            -- Fetch the row from the result set into the variable
+            Fetch Next from ProductIdCursor into @ProductId
+
+            -- If the result set still has rows, @@FETCH_STATUS will be ZERO
+            While(@@FETCH_STATUS = 0)
+            Begin
+            Declare @ProductName nvarchar(50)
+            Select @ProductName = Name from tblProducts where Id = @ProductId
+            
+            if(@ProductName = 'Product - 55')
+            Begin
+            Update tblProductSales set UnitPrice = 55 where ProductId = @ProductId
+            End
+            else if(@ProductName = 'Product - 65')
+            Begin
+            Update tblProductSales set UnitPrice = 65 where ProductId = @ProductId
+            End
+            else if(@ProductName like 'Product - 100%')
+            Begin
+            Update tblProductSales set UnitPrice = 1000 where ProductId = @ProductId
+            End
+            
+            Fetch Next from ProductIdCursor into @ProductId 
+            End
+
+            -- Release the row set
+            CLOSE ProductIdCursor 
+            -- Deallocate, the resources associated with the cursor
+            DEALLOCATE ProductIdCursor
+
+        Joins:
+            update tblProductSales
+            set UnitPrice= Case
+                            When Name='Product-55' Then 55
+                            When Name='Product-65' Then 65
+                            When Name LIKE 'Product-100%' Then 1000
+                            Else
+                                UnitPrice
+                           End
+            from tblProductSales
+            JOIN tblProducts
+            ON tblProducts.Id=tblProductSales.ProductId
+            Where Name='Product-55' or Name='Product-65' or Name LIKE 'Product-100%'
+
+    Note: Using cursor it takes 45 seconds but by using joins it takes 2-6 seconds only.
+
+
+T-SQL Query to list all tables in SQL Server DB:
+    Object explorer with in SQL Server management studio can ve used to get the list of tables in a specific database.
+    To do the same using query, there are 3 system views that we can use.
+    They are:
+        SYSOBJECTS - SQL Server 2000, 2005 & 2008
+        SYS.TABLES - SQL Server 2005 & 2008
+        INFORMATION_SCHEMA.TABLES - SQL Server 2005 & 2008
+
+    Example:
+        Select * from SYSOBJECTS where XTYPE='U'
+        Select * from SYS.TABLES
+        Select * from INFORMATION_SCHEMA.TABLES --Lists tables and views
+
+    To get the list of different object types(XTYPE) in a database:
+        Select Distinct XTYPE from SYSOBJECTS
+
+    XTYPE List(some):
+        IT - Internal Table
+        P - Stored Procedure
+        PK - PRIMARY KEY Constraint
+        S - System Table
+        U - User Table
+        V - View
+        Ref: https://docs.microsoft.com/en-us/sql/relational-databases/system-compatibility-views/sys-sysobjects-transact-sql?view=sql-server-ver15
+    
+Re-Runnable SQL Server Scripts:
+    A re-runnable script is a script, that, when run more than once, will not throw errors.
+
+    Example:
+        Use [Sample]
+        Create table tblEmployee
+        (
+            Id int identity primary key,
+            Name nvarchar(100),
+            Gender nvarchar(10),
+            DatOfBirth DateTime
+        )
+
+        If the above script has executed multiple times, it will throw error from the second attempt, 
+            as the table will be already created in first attempt.
+    
+        Use [Sample]
+        IF NOT EXISTS (select * from INFORMATION_SCHEMA.TABLES where table_name='tblEmployee')
+        BEGIN
+            Create table tblEmployee
+            (
+                Id int identity primary key,
+                Name nvarchar(100),
+                Gender nvarchar(10),
+                DatOfBirth DateTime
+            )
+            Print 'Table tblEmployee successfully created'
+        END
+        ELSE
+        BEGIN
+            Print 'Table tblEmployee already exists'
+        END
+
+        The above script will not throw error wvwn if we run multiple times. 
+
+    To make script re-runnable:
+        Check for the existence of the table
+        Create the table if it does not exist
+        Else print a message stating, the table already exists
+
+    SQL Server built-in function OBJECT_ID(<table_name>) can also be used to check for the existence.
+        If OBJECT_ID('tblEmployee') IS NULL
+        BEGIN
+        END
+    
+Alter database tables without dropping table:
+    Option 1:
+        Use a SQL query to alter the columns:
+            ALTER TABLE <table_name>
+            ALTER COLUMN <column_name> <data_type>(<size>)
+    
+    Option 2:
+        Tools->Options->Designers
+        Disable "Prevent saving changes that require table re-creation" option.
+
+Merge Statement:
+    Merge statement is introduced in SQL Server 2008 allows us to perform Inserts, Updates and Deletes in one statement.
+    This means we no longer have to use multiple statements for performing Insert, Update and Delete.
+
+    Code:
+        MERGE [Target] AS T
+        USING [Source] AS S
+            ON [Join_condition]
+        WHEN MATCHED THEN
+            [update statement]
+        WHEN NOT MATCHED BY TARGET THEN
+            [insert statement]
+        WHEN NOT MATCHED BY SOURCE THEN
+            [delete statement];
+
+    

@@ -1,0 +1,60 @@
+View:
+    A view is nothing more than a saved SQL query.
+    A view can also be considered as a virtual table.
+
+    Code:
+        CREATE VIEW <view_name>
+        AS
+        <select_query>
+
+    To execute view:
+        select * from <view_name>
+
+    Advantages:
+        It can be used to reduce the complexity of the database.
+        It can be used as a mechanism to implement row and column level security.
+        It can also be used to present aggregated data and hide detailed data.
+
+    Drop:
+        DROP VIEW <view_name>
+
+    Alter:
+        ALTER VIEW <view_name>
+        AS
+        <select_query>
+    
+    Updatable Views:
+        It is possible to INSERT, UPDATE & DELETE from the base table of the view.
+
+        UPDATE <view_name> set <column_name> = <value> WHERE <condition>
+        DELETE <view_name> where <condition>
+        INSERT INTO <view_name> VALUES(?,?,....)
+
+        If a view is based on multiple tables, and if the user update the view, 
+            it may not update the underlying base tables correctly.
+        To correctly update a view, that is based on multiple table, INSTEAD OF triggers are used.
+
+Indexed Views:
+    A standard or Non-indexed view, is just a stored SQL query. When, we try to retrive data from the view, 
+        the data is acually retrived from the underlying base tables.
+    
+    So, a view is just a virtual table it does not store any data, by default.
+    
+    However, when user create an index, on a view, the view get materialized.
+    This means, the view is now, capable of storing data.
+
+    In SQL Server, we call them indexed views and in Oracle, Materrialized views.
+
+    Guidelines for creating indexed view:
+        Views should be created with SchemaBinding option.
+        If an Aggregate function in the SELECT LIST, referemces and expression,
+            and if there is a possibility for that expression to become NULL, then, a replacement value should be specified.
+        If GROUP BY is specified, the view select list must contain a COUNT_BIG(*) expression.
+        The base tables in the view, should be referenced with 2 part name.
+
+
+Limitations:
+    Cannot pass parameters to a view. (use inline table-valued function as a replacement for parameterized views)
+    Rules and Defaults cannot be associated views.(As views are virtual table)
+    ORDER BY clause cannot be used in views unless TOP or FOR XML is specified.(can be used while executing the views)
+    Viewa are not allowed with temporary tables.

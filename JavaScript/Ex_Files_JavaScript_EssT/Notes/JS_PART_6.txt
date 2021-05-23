@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                        Sildebar: Variables and Data Types
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Introduction:
+    Naming objects - the creation of containers to put objects within
+    Variable - a container with some piece of data
+    The process of creating containers and placing objects inside them is also the way 
+        JS handles named objects.
+    To refer to some piece of data, first create a container called variable and then set its contents 
+        using the equals symbol.
+
+ Var:
+    It is a classic simple variable type.
+    It declares a function-scoped or globally-scoped variable.
+    It is mutable, change the value at any time and assign it a new value.
+    The default type of container is var, unless it is mentioned.
+    Var is globally scoped.
+    To handle the issues happened by var type of variable, as it is globally scoped, 
+        two more type of varibale are available let and scope.
+    This two types of varibales are locally scoped to handle the issue happened by var as alternate type.
+
+Let:
+    It declares a block-scoped local variable.
+    This type variable will be accessed with in the block it is declared.
+    When we want to use a changeable or mutable variable, let can be used.
+        That includes when you want to use it in global scope, because when you declare a let in global scope,
+            it will applu everywhere except where you redeclare it.
+    
+Const:
+    They are block-scoped much like let.
+    The value of const can't be changed through reassignment, and it can't be redeclared.
+    If we try to re-assign the vaue to this type of varibale, then the browser stops rendering 
+        and flag the error.
+    It is possible to change the properties of the const but not the whole container value itself.
+    It give protection from over written.
+
+Data Types:
+    JS is a weekly typed language.
+    It is not necessary to specify what type of value, the variables can hold.
+    JS by itself identify the type of data stored in that variable.
+    typeof <varible> - give the data type of the variable, identified by JS.
+
+Assignment vs Comparison:
+    = is an assignment operator.
+    = is an assignment of a value to a variable.
+    
+    == is comparison operator.
+    == is doing loose comparison.
+    It wont check data type is same or not, it will only check the value/symbol is same.
+    It wont ignore case and match value.
+    For eg, 5=="5" is true in JS.
+    It is called as semiotic equivalent.
+
+    === is also a comparison operator.
+    === is doing tight comparison.
+    It also checks for data type and case sensitive.
+    for eg, 5==="5" is false in JS.
+
+    != and !== can also be used which is the reverse of the above comparison operators.
+
+Math Operators:
+    + add
+    - subtract
+    * multiply
+    % modulo
+    ** power
+    ++/-- increment/decrement operator
+
+    + It also concatenates the value.
+

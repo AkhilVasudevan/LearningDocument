@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                        JavaScript: A Brief Introduction
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+
+Components:
+    Objects
+    Methods
+    Functions
+    Template literals
+    Arrays
+
+Some JS:
+    Vanilla JS
+    vue.js
+    React
+    Angular
+    CoffeeScript
+    TypeScript
+    ES2015
+    ES6
+    Node.js
+    JSX
+    etc...
+
+JS Landscape:
+    The core language; somtimes referred to as vanilla JavaScript or Vannilla JS.
+
+    The browser specification of the javascript langauage is ECMAScript.
+    It is a description about how the language should be interpreted by the browser.
+
+    ES6, ES2015,ES2017,ES2020, etc. refers to the use of features defined in ECMAScript,
+        but not necessarily supported by modern browser.
+
+    Using ECMAScript usually means also using Babel.js to make it work in current browser implementations.
+
+    other tools like babel are  npm, WebPack,Gulp,etc.
+
+Tools for JS:
+    Modern browser - ideally all the browser for testing
+    Code editor - Visual Studio Code is becoming the industry standard
+    Liver Server environment - extension to VS Code 
+    The browser console - available in browsers
+
+    Install Live server extension in vs code
+
+Linting and Formatting:
+    ESLint and Prettier can be used for linting and formatting.
+    Prettier helps automatically cleanup formatting.
+    ESLint helps automatically detect coding errors and can dp basic cleanup automatically.
+    
+Browser Console:
+    JS works on browser, as there will be console to directly interact with JS.
+
+    In browser console,
+        window.document - it will give the html code of the window
+    
+    From console we can access the variables and function of the js code.
+    If we change the value from console, we can also see the changes in the browser output also.
+    For that we have to write a function to alter in browser window also.
+
+JS Basics:
+    Write JS from top to bottom.
+    Declare variables, functions, objects, etc.. before using it.
+    // & /**/ have been used for commenting.
+    Browser does not care about space in js.
+    It can use single or doube; quotes for string.
+    It is optional to put semicolon after each statement.

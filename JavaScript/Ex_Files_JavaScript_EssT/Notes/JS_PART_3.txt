@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                                    Objects
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Objects:
+    JS is a prototype based object oriented programming language.
+    Each object has a definite unique properties of it own.
+    Each object is a unique instance of an object prototype.
+    Methods are property-changing features inside objects.
+    Another object can be a property of an object.
+
+JS Objects:
+    It is a collection data and functionality stored as properties and methods that describe the object.
+    To define an object, a variable have to be created.
+    To make variable an object, {}; has been assigned.
+        eg: var obj={}; //empty object
+    Each property is a name value pair, seperated by a colon.
+    A property can be of any type.
+    Each property is seperated by comma.
+    "this" keyword refers to the current object.
+
+Object Containers:
+    To hold an object, a container is need, which is called variable.
+    Content after equal symbol of varibale goes inside the container.
+    Objects are typically constants.
+    Once an object is created, we can change the properties but not the entire value of the object(ie. assigning var from {} to 5).
+    To achive above thing, objects are always decalred as constants.
+
+Object Properties:
+    Object properties are defined using a colon seperated name value pair, where the name can be any string
+        and is placed on the left and value can be of anything placed on the right.
+    Property name should only contain letters,digits,dollar signs and underscoresz.
+    If quotation marks or hypens or other symbols is added in property name, the object will not function properly.
+
+Accessing Objects:
+    Anytime to access an object or anything contained inside a variable, simply call it by its name and JS will handle it.
+    To print the object directly there are many options in console, most commonly used one is console.log().
+
+Accessing Object Properties:
+    There are two ways of accessing object properties, by dot notation and by bracket notation.
+    <object_name>.<property_name>
+    [or]
+    <object_name>[<property_name>]
+
+    Using bracket methods helps to do advanced things.
+    It helps to dynamically change the bracket value.
+    If non standard names is ther is the property then using bracket method is the best one.
+    
+Object Methods:
+    Methods are functions inside the objects.
+    Each method has been added to object as property.
+    There are two syntaxes for these methods.[ref functions chapter]
+    Function expression:(most used one)
+        <function_name> : FUNCTION (parameters...)
+        {<function_statement>}
+    
+Classes - Object Blueprints:
+    It is possible to create objects blueprints or templates using classes.
+    The two different ways of creating the class are as follows:
+        Class declaration: class Name {}
+        Class expression:  const Name = class {}
+    Class has to be declare before it has been used.
+
+Object Constructors:
+    There is another way of creating class which relies on a basic function called an object constructor function.
+    It is possible to extend class when we use class object instead of object constructor function.
+    Classes give more capabilities than object constructor function.
+
+Global Objects:
+    Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
+

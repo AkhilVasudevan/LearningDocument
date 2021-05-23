@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                                        Arrays
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Introduction:
+    Store -> Retrive -> Process the list of values.
+    Many functions are available to manipulate arrays.
+    It is possible to have multiple data type value in array.
+    If we try to insert the value at the position greater than length of array, 
+        then the value from length-1 to position-1 will be undefined.
+    Extremely flexible data container.
+
+Array Methods:
+    Ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#Instance_methods
+
+    array.join("delimeter") - it will concatenate all the values in array with the delimeter.
+    array.push('value1',value2,....) - it will add all the parameters as value in array.
+    array.unshift('value1',value2,....) - it will swap the value from front and back.
+    array.shift('value1',value2,....) - it will remove and place the value in the front and also pop in the front.
+    array.pop() - it will remove the element in the last index of array.

@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                        Up and Running with JS
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Js in HTML Document:
+    Anything inside the sciprt tag will be considered as a javascript and rendered as such.
+    Script tag can be placed anywhere in the document.
+    When a browser encounters an script tag, it will stops rendering the document and renders js program.
+    Js code in HTML document can be used only by the current document only.
+
+JS in External File:
+    There are situations where javascript functions are accessed in mulitple documents.
+    For such scenario, javascript file should be connected with html document through script tag with src attribute.
+    If a script tag is encountered, the js code will be rendered, while html will pause rendering.
+
+In general, it is adviced to give script tag in the bottom of the html document.
+JS throws error, while it tries to access html which is not yet rendered by browser.
+Based on the requirement place the script tag at the top or bottom of html document.
+
+Modern JS Loading:
+
+    Default behaviour:
+        Browser stops rendering when javascript is encountered.
+        JavaScript is executed before rendering continues.
+        Often referred to as content blocking.
+
+        HTML Parsing->(encounters js)->JS Download->JS Execution->HTML Parsing
+
+    To handle the above behaviour,
+    async:
+        Browser downloads JavaScript in parallel while HTML renders.
+        When JavaScript is fully loaded, rendering stops while JavaScript is executed.
+
+        HTML Parsing->(encountered js)->HTML Parsing until JS Download->JS Execution->HTML Parsing
+
+    To make sure the browser, only executes the JS, after the HTML document is complete,
+    defer:
+        Browser downloads JavaScript uin parallel while HTML renders, then defers 
+            execution of JavaScript until HTML rendering is complete.
+
+        HTML Parsing->(encountered js)->Download JS and HTML Parsing ->After HTML Parsing JS Execution
+
+    async/defer should be standard.
+    Only use render blocking when we have a specific reason.
+    Loading JavaScript in the footer is now an anti-pattern.
+
+JS Modules:
+    JavaScript modules allows us to break pieces out of a JavaScript file and place them in a seperate file
+        and import them into the original file again.
+    
+    To export any object to another js file,
+        export default <object_name>;
+
+    To import any exported object,
+        import <object_name> from '<file_path>';
+
+    In HTML document, we have to refer both the js file having an attribute type and values as module.
+    If the type of script is module, then the browser will understands that some objects are imported and experted within the js files.
+    So JS will run after HTML rendering by default.
+
+    In this case, if we try to access the imported object in console, it will throw error.
+    As the object cannot be access in the curretn state, so it is important to find what objects are to be made as modules.
+

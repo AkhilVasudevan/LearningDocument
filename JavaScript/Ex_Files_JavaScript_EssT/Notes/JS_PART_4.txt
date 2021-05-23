@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                            Slidebar: String Output
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+A typical use of JavaScript is to either generate HTML, modify existing HTML, or remove HTML from a live document in the browser.
+JS is an interactive layer on the top of the content, the HTML, and its presentation, the CSS.
+Have to access the element in HTML to change the content of the document.
+It is possible to access element in HTML using template literal.
+
+document.body.innerHTMl:
+    It has been used to access the body part of the html.
+
+Anything within `` will be considered as templates, where it can be strings, html tags, javascript contents,etc.
+To place any javascript value inside the html template use ${}
+
+Using double quoted string with concatenation of js variables, it is possible to render the HTML document.
+But string concatenation method should be avoided more.

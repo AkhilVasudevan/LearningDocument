@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                                        Events
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Introduction:
+    DOM events are sent to notify code of interesting things that have taken place.
+    Ref: https://developer.mozilla.org/en-US/docs/Web/Events
+    Implement event handler by using anonymous function or arrow function.
+
+Event Listeners:
+    A method added to a target, usually an element, that listens for a specific event and then calls back a function when that event is detected.
+
+    Code:
+        target.addEventListener("<action>",<callback_function>,{true|false})
+
+Advanced Listeners and "this":
+    It is not possible to use "this" in the arrow function.
+    So to use "this" ponter, callback function has been used instead.
+    As the callback function runs inside the event listener, so "this" pointer is accessible.
+
+Pass arguments through event listeners:
+    It is possible to pass arguments to the callback functions in event listeners.
+    As we need to pass the target also as argument, unless "this" operator will be lost(this will refers to arrow function).
+    Also instead of "this", target name should be used.
+    It is optional to pass event to the callback function.
+
+    Code:
+         target.addEventListener("<action>", (event) => {
+            callbackFunction(event, target, newArg)
+        })
+    

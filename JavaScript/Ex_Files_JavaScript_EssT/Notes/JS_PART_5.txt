@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+                                            DOM
+---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
+
+Introduction:
+    DOM is short for "Document Object Model", the document object the browser creates when it renders an HTML document.
+    When a web browser is presented with an HTML document, it creates an object model for the document,
+        a Document Object Model or DOM.
+    DOM describes the hierarchical tree structure for that document, how the different elements 
+        in the document relate to each other and are nested.
+
+Access Elements with querySelector methods:
+    Two methods can be used:
+        Document.querySelector()
+        Document.querySelectorAll()
+    These methods use standard CSS queries to climb through the DOM tree and find the specified elements.
+    we can get the content by using tag name or css property using query selector.
+
+Access Elements using older methods:
+    Two methods can be used:
+        Document.getelementsbyClassName() - it always returns an array
+        Document.getelementbyId() - It will give html object
+
+As accessing elements with querySelector is better than using get element methods,
+    as querySelector has advantage of using css preoperty for selecting.
+
+
+Modifying element classes:
+    This is an simple way of modifying the behaviour of element without having to inject CSS into the HTML itself.
+    Instead, we just add a class or remove a class to make something happen.
+
+    Using query selectot it is possible to change the class name.
+    code:
+        document.querySelector('tag').className='new-class'
+
+    If a property with several class and want to change one of the classes, we have to parse out to know,
+        which have to be changed and requires a lot of code.
+
+    To avoid the above issue, use classList property.
+    code:
+        document.querySelector('tag').classList.add('new-class')
+        document.querySelector('tag').classList.remove('new-class')
+        document.querySelector('tag').classList.toggle('new-class')
+        document.querySelector('tag').classList.replace('existing-class','new-class')
+    
+Attributes:
+    It is possible to change the attributes using JS.
+    using element.attributes , will return NamedNodeMap.
+    Ther are buildin methods to work with attributes as well.
+    hasAttribute('attribute-name') - used to check whether attribute is available or not
+    getAttribute('attribute-name') - used to get value of the attribute.
+    setAttribute('attribute-name','attribute-value') - used to change attribute value or create new attribute.
+    removeAttribute('attribute-name') - remove the attribute from the element
+    
+Inline Style:
+    It is possible to directly access/assign the inline style.
+    code:
+        document.querySelector('class').style.<style_name>
+
+Add DOM Elements:
+    To add a new element createElement() has been used to create an element.
+    To add the created element append() is used.
+    code:
+        cont element=document.createElement('tag')
+        parentNode.append(element)
+    To add created element as the first child of the parent node, prepend() is used.
+    code:
+        parentNode.prepend(element)
+    To move the element to different position appendChild() is used. It also returns the element that is working on.
+    To replace a child node replaceChild() is used.
+    To insert a child node before another child node insertBefore() is used.
+    To insert a child node at agiven position insertAdjacentElement() is used.

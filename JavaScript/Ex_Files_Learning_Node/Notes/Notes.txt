@@ -1,0 +1,68 @@
+Node is an opensource, cross-platform, runtime environment for server-side and networking applications. 
+It is built on top of Chrome's JavaScript runtime, the V8 engine, and so applications for Node are written in JavaScript
+
+Benifits of using JS for webapps:
+    Syntax same for front-end and back-end
+    Being able to share code and data structure between front-end and back-end
+
+Benifits of JS(Node):
+    Sharing language  & code between front-end and back-end
+    Dyanamic language - type is determined by value
+    Works well with JSON
+
+Asynchronous and call backs made JS more flexible.
+
+
+Node has something called a Node Package Manager, or NPM for short. 
+Packages are one or more modules bundled together.
+
+To install any package:
+    npm install <package>
+
+There are many command line node modules. One of them are nodemon.
+It has to be installed globally.
+
+To install any package globally:
+    npm install -g <package>
+
+To have a list of packages used by the project "project.json" file has been used.
+
+To create "package.json" file:
+    npm init
+It asks for some analysis questions for dev purpose and file will be created.
+
+To create "package.json" with defaults:
+    npm init --yes
+
+'fs' is the file system library used to deal with filesystem.
+
+
+Web API is a service that allows to get and save data to a server or backend.
+
+To create an express in current project:
+    npm install -s express
+
+Since there is no default body parser for request So body parse have to be installed.
+To install body parser in current project:
+    npm install -s body-parser
+
+To achieve two way communication socket.io have to be used.
+It is a kind of web socket library.
+If a client is using websocket non supporting browser, it will automatically use pooling.
+
+To install socket.io in current project:
+    npm install -s socket.io
+
+As it is bit trickier to use, because http server have to be created and build an express & socket on that.
+
+To use mongodb, install mongoose in current project:
+    npm install -s mongoose
+
+Promises is an another alternate for callback which is used to handle nested callback.
+This helps in working with asynchronous code in a more synchronous way.
+
+Sometimes promises look long, so we can use async and await to make it easier.
+
+We can use try catch block to handle exceptions.
+Especially during promises, using try/catch is preferred to handle exceptions.
+
